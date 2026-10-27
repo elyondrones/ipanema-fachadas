@@ -459,7 +459,8 @@ function onOrient(e){
 /* sem botão: a profundidade já começa sozinha, num balanço lento. Onde o celular libera o sensor
    (Android direto; iPhone no primeiro toque em qualquer lugar), a inclinação assume.
    No link do claude.ai o sensor é bloqueado e fica o balanço. */
-const needsPerm=typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function';
+// só celular: o Chrome do computador também tem requestPermission, mas não tem sensor
+const needsPerm=typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function' && matchMedia('(pointer:coarse)').matches;
 // aviso só no iPhone (onde precisa do toque); some quando o sensor libera ou é recusado
 const hint=document.getElementById('motion');
 if(hint){ hint.lastChild.textContent='Toque na tela para ativar a profundidade'; hint.style.display=needsPerm?'flex':'none'; }
