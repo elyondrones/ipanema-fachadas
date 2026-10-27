@@ -459,12 +459,15 @@ function onOrient(e){
 /* sem botão: a profundidade já começa sozinha, num balanço lento. Onde o celular libera o sensor
    (Android direto; iPhone no primeiro toque em qualquer lugar), a inclinação assume.
    No link do claude.ai o sensor é bloqueado e fica o balanço. */
-document.getElementById('motion')?.remove();
 const needsPerm=typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function';
+// aviso só no iPhone (onde precisa do toque); some quando o sensor libera ou é recusado
+const hint=document.getElementById('motion');
+if(hint){ hint.lastChild.textContent='Toque na tela para ativar a profundidade'; hint.style.display=needsPerm?'flex':'none'; }
+const hideHint=()=>{ if(hint){ hint.style.transition='opacity .4s'; hint.style.opacity='0'; setTimeout(()=>hint.remove(),450); } };
 // no iPhone o pedido só vale dentro de um toque completo (touchend/click; pointerdown não conta para o Safari)
 let granted=false;
 function askMotion(){ if(granted) return;
-  DeviceOrientationEvent.requestPermission().then(r=>{ if(r==='granted' && !granted){ granted=true; addEventListener('deviceorientation',onOrient); } }).catch(()=>{}); }
+  DeviceOrientationEvent.requestPermission().then(r=>{ hideHint(); if(r==='granted' && !granted){ granted=true; addEventListener('deviceorientation',onOrient); } }).catch(()=>{}); }
 if(needsPerm){ addEventListener('touchend',askMotion,{capture:true,passive:true}); addEventListener('click',askMotion,{capture:true}); }
 else addEventListener('deviceorientation',onOrient);
 let mouse=false;
